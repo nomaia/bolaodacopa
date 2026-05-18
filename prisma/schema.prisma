@@ -1,0 +1,120 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model User {
+  id            String         @id @default(cuid())
+  name          String?
+  email         String         @unique
+  emailVerified DateTime?
+  image         String?
+  passwordHash  String?
+  createdAt     DateTime       @default(now())
+  isAdmin       Boolean        @default(false)
+  accounts      Account[]
+  boloesCreated Bolao[]        @relation("BolaoCreator")
+  palpites      Palpite[]
+  participacoes Participante[]
+  sessions      Session[]
+}
+
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String?
+  access_token      String?
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String?
+  session_state     String?
+  user              User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+}
+
+model Bolao {
+  id            String         @id @default(cuid())
+  nome          String
+  descricao     String?
+  codigo        String         @unique
+  publico       Boolean        @default(true)
+  createdAt     DateTime       @default(now())
+  criadorId     String
+  criador       User           @relation("BolaoCreator", fields: [criadorId], references: [id])
+  palpites      Palpite[]
+  participantes Participante[]
+}
+
+model Participante {
+  id       String   @id @default(cuid())
+  joinedAt DateTime @default(now())
+  userId   String
+  bolaoId  String
+  bolao    Bolao    @relation(fields: [bolaoId], references: [id], onDelete: Cascade)
+  user     User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, bolaoId])
+}
+
+model Jogo {
+  id            String    @id @default(cuid())
+  timeCasa      String
+  timeVisitante String
+  dataHora      DateTime
+  fase          String
+  grupo         String?
+  golsCasa      Int?
+  golsVisitante Int?
+  encerrado     Boolean   @default(false)
+  createdAt     DateTime  @default(now())
+  rodada        Int?
+  palpites      Palpite[]
+}
+
+model Palpite {
+  id                   String   @id @default(cuid())
+  golsCasaPalpite      Int
+  golsVisitantePalpite Int
+  pontos               Int?
+  createdAt            DateTime @default(now())
+  updatedAt            DateTime @updatedAt
+  userId               String
+  jogoId               String
+  bolaoId              String
+  bolao                Bolao    @relation(fields: [bolaoId], references: [id], onDelete: Cascade)
+  jogo                 Jogo     @relation(fields: [jogoId], references: [id], onDelete: Cascade)
+  user                 User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, jogoId, bolaoId])
+}
+
+model playing_with_neon {
+  id    Int    @id @default(autoincrement())
+  name  String
+  value Float? @db.Real
+}
