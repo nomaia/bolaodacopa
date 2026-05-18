@@ -32,8 +32,15 @@ export default function LoginPage() {
     }
   }
 
+  const passos = [
+    { num: "1", label: "Crie sua conta ou entre", cor: "bg-yellow-400 text-yellow-900" },
+    { num: "2", label: "Acesse um bolão com o código", cor: "bg-green-400 text-green-900" },
+    { num: "3", label: "Dê seus palpites antes do jogo", cor: "bg-blue-400 text-blue-900" },
+    { num: "4", label: "Torça e acompanhe o ranking", cor: "bg-orange-400 text-orange-900" },
+  ];
+
   return (
-    <main className="min-h-screen flex items-center justify-center bg-green-700 p-6">
+    <main className="min-h-screen flex flex-col items-center justify-center bg-green-700 p-6 gap-6">
       <div className="bg-white rounded-xl shadow-lg p-8 w-full max-w-sm space-y-6">
         <div className="text-center">
           <span className="text-4xl">⚽</span>
@@ -79,6 +86,19 @@ export default function LoginPage() {
             Cadastre-se
           </Link>
         </p>
+      </div>
+
+      {/* Passo a passo */}
+      <div className="w-full max-w-sm bg-white/10 rounded-xl p-5 space-y-3">
+        <p className="text-white text-xs font-semibold uppercase tracking-widest text-center mb-1">Como funciona</p>
+        {passos.map((p) => (
+          <div key={p.num} className="flex items-center gap-3">
+            <div className={`w-7 h-7 rounded-full flex items-center justify-center font-bold text-sm shrink-0 ${p.cor}`}>
+              {p.num}
+            </div>
+            <p className="text-white text-sm">{p.label}</p>
+          </div>
+        ))}
       </div>
     </main>
   );
